@@ -1,8 +1,18 @@
 import { Router, Request, Response } from 'express';
-import { openai, SYSTEM_PROMPT, MODEL, TEMPERATURE } from '../lib/openai.js';
+import { openai, SYSTEM_PROMPT, MODEL, TEMPERATURE, isOpenAIConfigured } from '../lib/openai.js';
 import { getSession, addMessage, updateSession, createSession, type Message } from '../lib/sessions.js';
+import { getMockResponse, MOCK_REPORT } from '../lib/mockResponses.js';
 
 export const chatRouter = Router();
+
+// Helper to simulate streaming for mock mode
+async function* mockStreamResponse(text: string) {
+  const words = text.split(' ');
+  for (const word of words) {
+    yield word + ' ';
+    await new Promise(resolve => setTimeout(resolve, 20)); // Simulate typing
+  }
+}
 
 chatRouter.post('/', async (req: Request, res: Response) => {
   try {
@@ -22,47 +32,55 @@ chatRouter.post('/', async (req: Request, res: Response) => {
     const userMessage: Message = { role: 'user', content: message };
     addMessage(session.id, userMessage);
 
-    // Build messages array for OpenAI
-    const messages: Message[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...session.messages
-    ];
-
     // Set headers for streaming
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('X-Session-Id', session.id);
 
-    // Create streaming completion
-    const stream = await openai.chat.completions.create({
-      model: MODEL,
-      messages: messages,
-      temperature: TEMPERATURE,
-      stream: true
-    });
-
     let fullResponse = '';
 
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content || '';
-      if (content) {
-        fullResponse += content;
-        res.write(`data: ${JSON.stringify({ content, sessionId: session.id })}\n\n`);
+    // Check if OpenAI is configured
+    if (isOpenAIConfigured()) {
+      // Use real OpenAI
+      const messages: Message[] = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...session.messages
+      ];
+
+      const stream = await openai.chat.completions.create({
+        model: MODEL,
+        messages: messages,
+        temperature: TEMPERATURE,
+        stream: true
+      });
+
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        if (content) {
+          fullResponse += content;
+          res.write(`data: ${JSON.stringify({ content, sessionId: session.id })}\n\n`);
+        }
+      }
+    } else {
+      // Use mock responses (demo mode)
+      const mockResponse = getMockResponse(session.currentQuestion);
+      
+      for await (const chunk of mockStreamResponse(mockResponse)) {
+        fullResponse += chunk;
+        res.write(`data: ${JSON.stringify({ content: chunk, sessionId: session.id })}\n\n`);
       }
     }
 
     // Add assistant response to session
     addMessage(session.id, { role: 'assistant', content: fullResponse });
 
-    // Update question count based on response analysis
-    const questionMatch = fullResponse.match(/Question\s+(\d+)/i);
-    if (questionMatch) {
-      updateSession(session.id, { 
-        currentQuestion: parseInt(questionMatch[1]),
-        status: 'in_progress'
-      });
-    }
+    // Update question count
+    const newQuestionNumber = session.currentQuestion + 1;
+    updateSession(session.id, { 
+      currentQuestion: newQuestionNumber,
+      status: 'in_progress'
+    });
 
     // Check if assessment is complete (report generated)
     if (fullResponse.includes('AI Pilot Project Readiness Report')) {
@@ -102,19 +120,34 @@ chatRouter.post('/sync', async (req: Request, res: Response) => {
     const userMessage: Message = { role: 'user', content: message };
     addMessage(session.id, userMessage);
 
-    const messages: Message[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...session.messages
-    ];
+    let response = '';
 
-    const completion = await openai.chat.completions.create({
-      model: MODEL,
-      messages: messages,
-      temperature: TEMPERATURE
-    });
+    if (isOpenAIConfigured()) {
+      const messages: Message[] = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...session.messages
+      ];
 
-    const response = completion.choices[0]?.message?.content || '';
+      const completion = await openai.chat.completions.create({
+        model: MODEL,
+        messages: messages,
+        temperature: TEMPERATURE
+      });
+
+      response = completion.choices[0]?.message?.content || '';
+    } else {
+      // Mock mode
+      response = getMockResponse(session.currentQuestion);
+    }
+
     addMessage(session.id, { role: 'assistant', content: response });
+
+    // Update question count
+    const newQuestionNumber = session.currentQuestion + 1;
+    updateSession(session.id, { 
+      currentQuestion: newQuestionNumber,
+      status: 'in_progress'
+    });
 
     // Check for report completion
     if (response.includes('AI Pilot Project Readiness Report')) {
@@ -140,4 +173,3 @@ chatRouter.post('/sync', async (req: Request, res: Response) => {
     });
   }
 });
-

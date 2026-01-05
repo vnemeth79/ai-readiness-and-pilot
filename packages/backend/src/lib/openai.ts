@@ -1,12 +1,18 @@
 import OpenAI from 'openai';
 
-if (!process.env.OPENAI_API_KEY) {
-  console.warn('⚠️ OPENAI_API_KEY not set. AI features will not work.');
+const apiKey = process.env.OPENAI_API_KEY;
+
+if (!apiKey) {
+  console.warn('⚠️ OPENAI_API_KEY not set. Running in DEMO MODE with mock responses.');
 }
 
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || ''
+  apiKey: apiKey || 'demo-mode-no-key'
 });
+
+export function isOpenAIConfigured(): boolean {
+  return !!(apiKey && apiKey !== 'sk-placeholder' && apiKey.startsWith('sk-'));
+}
 
 export const SYSTEM_PROMPT = `**Your Role:** You are an expert AI Business Consultant. Your mission is to guide clients through a strategic assessment to identify the most impactful AI pilot projects for their business. You are professional, insightful, and your recommendations are grounded in the client's specific needs and readiness.
 
