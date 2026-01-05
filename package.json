@@ -1,0 +1,19 @@
+{
+  "name": "ai-readiness-survey",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Pilot Project Assessment Tool - A conversational AI tool to evaluate business AI readiness",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  },
+  "keywords": ["ai", "assessment", "pilot", "readiness"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.22.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

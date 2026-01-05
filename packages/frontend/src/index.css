@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+@theme {
+  --color-minerva-red: #C41E3A;
+  --color-minerva-red-dark: #9B1B30;
+  --color-minerva-red-light: #E63950;
+  --color-minerva-red-50: #FDF2F4;
+  --color-minerva-red-100: #FCE7EA;
+  --color-minerva-red-200: #F9D0D7;
+  --color-minerva-red-500: #C41E3A;
+  --color-minerva-red-700: #9B1B30;
+  --color-minerva-black: #0D0D0D;
+  --color-minerva-charcoal: #1A1A1A;
+  --color-minerva-gray: #2D2D2D;
+  
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-family-display: 'Playfair Display', Georgia, serif;
+  
+  --animate-fade-in: fadeIn 0.5s ease-out;
+  --animate-slide-up: slideUp 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #0D0D0D;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A1A1A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C41E3A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E63950;
+}
+
+/* Markdown styling */
+.markdown-content h1 {
+  @apply text-3xl font-bold mb-4 text-white;
+  font-family: 'Playfair Display', serif;
+}
+
+.markdown-content h2 {
+  @apply text-2xl font-semibold mb-3 text-white;
+}
+
+.markdown-content h3 {
+  @apply text-xl font-semibold mb-2 text-white;
+}
+
+.markdown-content p {
+  @apply mb-4 leading-relaxed text-gray-300;
+}
+
+.markdown-content ul {
+  @apply mb-4 pl-6 list-disc;
+}
+
+.markdown-content ol {
+  @apply mb-4 pl-6 list-decimal;
+}
+
+.markdown-content li {
+  @apply mb-2 text-gray-300;
+}
+
+.markdown-content table {
+  @apply w-full border-collapse mb-6 text-sm;
+}
+
+.markdown-content th {
+  @apply bg-minerva-red/20 border border-minerva-red/30 px-4 py-2 text-left font-semibold text-white;
+}
+
+.markdown-content td {
+  @apply border border-gray-700 px-4 py-2 text-gray-300;
+}
+
+.markdown-content strong {
+  @apply font-semibold text-white;
+}
+
+.markdown-content hr {
+  @apply my-6 border-gray-700;
+}
+
+/* Minerva button */
+.btn-minerva {
+  background: linear-gradient(to right, #C41E3A, #9B1B30);
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(196, 30, 58, 0.3);
+}
+
+.btn-minerva:hover {
+  background: linear-gradient(to right, #E63950, #C41E3A);
+  box-shadow: 0 6px 25px rgba(196, 30, 58, 0.5);
+}
+
+.btn-minerva:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: #C41E3A;
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
