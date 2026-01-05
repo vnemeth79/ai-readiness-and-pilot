@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Download, Calendar, Lock, Unlock, CheckCircle, ArrowRight } from 'lucide-react';
+import { Download, Calendar, Unlock, CheckCircle, ArrowRight } from 'lucide-react';
 import { MinervaLogo, PoweredBy } from './PoweredBy';
 import type { AssessmentScores } from '../types';
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
-import { MinervaLogo, PoweredBy } from './PoweredBy';
+import { PoweredBy } from './PoweredBy';
 import type { Message } from '../types';
 
 interface ChatInterfaceProps {
