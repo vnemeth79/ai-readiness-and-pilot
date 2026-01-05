@@ -2,8 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://ai-readiness-api.vercel.app/api/:path*"
+      "destination": "https://ai-readiness-and-pilot-backend.vercel.app/api/:path*"
     }
   ]
 }
-
